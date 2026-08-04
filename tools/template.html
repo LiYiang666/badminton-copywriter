@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#7ED8C3">
+<title>🏸 进进的专属文案生成器</title>
+<style>
+  :root {
+    --mint: #58C7AC;
+    --mint-deep: #1A7F64;
+    --pink: #FF8FAB;
+    --pink-deep: #E86A8A;
+    --ink: #3A3A4A;
+    --ink-soft: #8A8A9A;
+    --card: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
+  html { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(165deg, #E6FAF3 0%, #FFF0F4 55%, #FFE9EE 100%);
+    color: var(--ink);
+    display: flex; flex-direction: column;
+    max-width: 480px; margin: 0 auto;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  header { padding: 22px 20px 10px; text-align: center; }
+  header h1 {
+    font-size: 1.35rem; font-weight: 800;
+    background: linear-gradient(90deg, var(--mint-deep), var(--pink-deep));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: 0.5px;
+  }
+  header p { font-size: 0.75rem; color: var(--ink-soft); margin-top: 4px; }
+  .tabs { display: flex; gap: 8px; padding: 10px 16px; flex-wrap: wrap; justify-content: center; flex-shrink: 0; }
+  .tab {
+    flex-shrink: 0; padding: 8px 16px; border-radius: 999px;
+    border: 1.5px solid rgba(88, 199, 172, 0.35);
+    background: rgba(255,255,255,0.75);
+    color: var(--mint-deep); font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px);
+  }
+  .tab.active {
+    background: linear-gradient(90deg, var(--mint), var(--pink));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 4px 12px rgba(232, 106, 138, 0.3);
+  }
+  main { flex: 1; display: flex; flex-direction: column; padding: 8px 20px 12px; min-height: 0; overflow-y: auto; }
+  .card {
+    background: var(--card); border-radius: 24px; padding: 28px 24px 20px;
+    box-shadow: 0 10px 30px rgba(26, 127, 100, 0.10), 0 2px 8px rgba(232,106,138,0.08);
+    position: relative;
+    margin: auto 0;
+    animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes pop {
+    0% { transform: scale(0.92) translateY(8px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .card .badge {
+    position: absolute; top: -12px; left: 24px;
+    padding: 5px 14px; border-radius: 999px;
+    background: linear-gradient(90deg, var(--mint), var(--pink));
+    color: #fff; font-size: 0.72rem; font-weight: 700;
+    box-shadow: 0 3px 8px rgba(232,106,138,0.35);
+  }
+  .card .text {
+    font-size: 1.3rem; line-height: 1.75; font-weight: 700;
+    min-height: 4.5em; display: flex; align-items: center; word-break: break-all;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .tag {
+    font-size: 0.72rem; color: var(--pink-deep); background: #FFF0F4;
+    border: 1px solid rgba(232,106,138,0.25); padding: 4px 10px; border-radius: 999px;
+  }
+  .card-actions { display: flex; gap: 10px; margin-top: 18px; border-top: 1px dashed #EEE; padding-top: 14px; }
+  .btn-copy {
+    flex: 1; padding: 12px 0; border: none; border-radius: 14px;
+    background: linear-gradient(90deg, var(--mint), #6FD3BC);
+    color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(88,199,172,0.35); transition: transform 0.15s;
+  }
+  .btn-copy:active { transform: scale(0.96); }
+  .btn-fav {
+    width: 52px; border: 1.5px solid rgba(232,106,138,0.35); border-radius: 14px;
+    background: #fff; font-size: 1.2rem; cursor: pointer; transition: transform 0.15s;
+  }
+  .btn-fav.on { background: #FFF0F4; border-color: var(--pink); }
+  .btn-fav:active { transform: scale(0.9); }
+  .footer-bar { padding: 6px 20px calc(20px + env(safe-area-inset-bottom)); flex-shrink: 0; }
+  .btn-random {
+    width: 100%; padding: 17px 0; border: none; border-radius: 999px;
+    background: linear-gradient(90deg, var(--mint), var(--pink));
+    color: #fff; font-size: 1.1rem; font-weight: 800; letter-spacing: 2px;
+    cursor: pointer; box-shadow: 0 8px 20px rgba(232,106,138,0.35); transition: transform 0.15s;
+  }
+  .btn-random:active { transform: scale(0.97); }
+  .list { display: flex; flex-direction: column; gap: 10px; padding: 6px 2px 12px; width: 100%; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(232,106,138,0.4) transparent; }
+  .list::-webkit-scrollbar { width: 4px; }
+  .list::-webkit-scrollbar-thumb { background: rgba(232,106,138,0.4); border-radius: 4px; }
+  .list::-webkit-scrollbar-track { background: transparent; }
+  .list-item {
+    background: #fff; border-radius: 16px; padding: 12px 14px;
+    box-shadow: 0 2px 8px rgba(26,127,100,0.08);
+    display: flex; gap: 8px; align-items: center;
+    animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .list-item .ht { flex: 1; font-size: 0.9rem; font-weight: 600; line-height: 1.55; word-break: break-all; }
+  .list-item button {
+    border: none; border-radius: 10px; padding: 8px 12px;
+    font-size: 0.8rem; font-weight: 700; cursor: pointer; flex-shrink: 0;
+  }
+  .list-item .hc { background: #FFF0F4; color: var(--pink-deep); }
+  .list-item .hf { background: #E6FAF3; color: var(--mint-deep); }
+  .list-item button:active { transform: scale(0.92); }
+  .toast {
+    position: fixed; top: 24px; left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: rgba(58,58,74,0.92); color: #fff;
+    padding: 10px 22px; border-radius: 999px; font-size: 0.85rem;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 99; pointer-events: none;
+    max-width: 86%; text-align: center;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .empty { text-align: center; color: var(--ink-soft); font-size: 0.9rem; padding: 40px 0; line-height: 2; }
+  @media (min-width: 768px) {
+    body { max-width: 680px; }
+    .tabs { flex-wrap: wrap; justify-content: center; overflow: visible; }
+    .card .text { font-size: 1.5rem; }
+    .list-item .ht { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🏸 进进的专属文案生成器</h1>
+  <p>一点就有文案 · 发球式灵感</p>
+</header>
+<div class="tabs" id="tabs"></div>
+<main>
+  <div class="card" id="card">
+    <span class="badge" id="badge">甜美撒娇</span>
+    <div class="text" id="text"></div>
+    <div class="tags" id="tags"></div>
+    <div class="card-actions">
+      <button class="btn-copy" id="copyBtn">📋 一键复制</button>
+      <button class="btn-fav" id="favBtn">🤍</button>
+    </div>
+  </div>
+  <div class="list" id="list" hidden></div>
+</main>
+<div class="footer-bar" id="footerBar">
+  <button class="btn-random" id="randomBtn">🎲 换一条</button>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const CORPUS = __CORPUS__;
+const CATS = [
+  { key: "all", label: "✨ 全部" },
+  { key: "sweet", label: "🍬 甜美撒娇" },
+  { key: "confident", label: "😎 自信反差" },
+  { key: "badminton", label: "🏸 羽毛球梗" },
+  { key: "lyric", label: "🎵 歌词向" },
+  { key: "interact", label: "👯 互动召唤" },
+  { key: "history", label: "🕘 历史" },
+  { key: "fav", label: "❤️ 收藏" }
+];
+const CAT_LABEL = { sweet: "🍬 甜美撒娇", confident: "😎 自信反差", badminton: "🏸 羽毛球梗", lyric: "🎵 歌词向", interact: "👯 互动召唤" };
+let curCat = "all";
+let curItem = null;
+let favs = [];
+let hist = [];
+let lastByCat = {};
+try { favs = JSON.parse(localStorage.getItem("bwc_favs") || "[]"); } catch (e) { favs = []; }
+try { hist = JSON.parse(localStorage.getItem("bwc_hist") || "[]"); } catch (e) { hist = []; }
+
+const $ = (id) => document.getElementById(id);
+const tabsEl = $("tabs"), textEl = $("text"), tagsEl = $("tags"), badgeEl = $("badge"),
+      favBtn = $("favBtn"), toastEl = $("toast"), cardEl = $("card"),
+      listEl = $("list"), footerBar = $("footerBar");
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function pool() {
+  if (curCat === "all") return CORPUS;
+  return CORPUS.filter(c => c.category === curCat);
+}
+// 不重复抽取：每个分类一个洗牌袋，抽完一轮再重新洗牌
+const bags = {};
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function pick() {
+  const p = pool();
+  if (!p.length) return null;
+  const ids = new Set(p.map(c => c.id));
+  let bag = (bags[curCat] || []).filter(id => ids.has(id));
+  if (!bag.length) bag = shuffle(p.map(c => c.id));
+  let id = bag.pop();
+  if (curItem && id === curItem.id && bag.length) {
+    const swap = bag.pop();
+    bag.push(id);
+    id = swap;
+  }
+  bags[curCat] = bag;
+  const item = p.find(c => c.id === id) || null;
+  if (item) {
+    hist = [item.id, ...hist.filter(h => h !== item.id)].slice(0, 50);
+    localStorage.setItem("bwc_hist", JSON.stringify(hist));
+    if (bag.length === 0) {
+      toast("该分类文案已经全部刷完啦~ 如果想要更多文案请联系昂哥 🏸");
+    }
+  }
+  return item;
+}
+function render(item) {
+  curItem = item;
+  if (!item) {
+    badgeEl.textContent = "✨ 全部";
+    textEl.innerHTML = '<div class="empty" style="width:100%">这里还没有文案哦</div>';
+    tagsEl.innerHTML = "";
+    favBtn.textContent = "🤍";
+    return;
+  }
+  badgeEl.textContent = CAT_LABEL[item.category] || "";
+  textEl.textContent = item.text;
+  tagsEl.innerHTML = item.tags.map(t => '<span class="tag">' + esc(t) + "</span>").join("");
+  favBtn.textContent = favs.includes(item.id) ? "❤️" : "🤍";
+  favBtn.classList.toggle("on", favs.includes(item.id));
+  cardEl.style.animation = "none";
+  void cardEl.offsetWidth;
+  cardEl.style.animation = "";
+}
+// 卡片分类：切回时显示上次的文案，只有"换一条"才抽新
+function showCategory() {
+  const remembered = lastByCat[curCat];
+  const item = remembered ? CORPUS.find(c => c.id === remembered) : null;
+  if (item) { render(item); }
+  else {
+    const it = pick();
+    if (it) lastByCat[curCat] = it.id;
+    render(it);
+  }
+}
+function showList(mode) {
+  cardEl.hidden = true;
+  footerBar.hidden = true;
+  listEl.hidden = false;
+  let items = [];
+  if (mode === "history") {
+    items = hist.map(id => CORPUS.find(c => c.id === id)).filter(Boolean);
+    if (!items.length) {
+      listEl.innerHTML = '<div class="empty">还没有历史记录<br>去抽几条文案吧~</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(it =>
+      '<div class="list-item"><div class="ht">' + esc(it.text) + '</div><button class="hc" data-id="' + it.id + '">复制</button></div>'
+    ).join("");
+  } else {
+    items = favs.map(id => CORPUS.find(c => c.id === id)).filter(Boolean);
+    if (!items.length) {
+      listEl.innerHTML = '<div class="empty">还没有收藏哦<br>看到喜欢的点 🤍 收起来吧</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(it =>
+      '<div class="list-item"><div class="ht">' + esc(it.text) + '</div><button class="hc" data-id="' + it.id + '">复制</button><button class="hf" data-id="' + it.id + '">取消</button></div>'
+    ).join("");
+  }
+}
+function showCardMode() {
+  listEl.hidden = true;
+  cardEl.hidden = false;
+  footerBar.hidden = false;
+}
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  setTimeout(() => toastEl.classList.remove("show"), 2200);
+}
+async function copyItem(item) {
+  if (!item) { toast("先抽一条文案吧～"); return; }
+  const full = item.text + "\n" + item.tags.join(" ");
+  try {
+    await navigator.clipboard.writeText(full);
+    toast("✅ 已复制，去粘贴吧！");
+  } catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = full;
+    ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    toast("✅ 已复制，去粘贴吧！");
+  }
+}
+// tabs
+tabsEl.innerHTML = CATS.map(c =>
+  '<button class="tab' + (c.key === curCat ? " active" : "") + '" data-key="' + c.key + '">' + c.label + "</button>"
+).join("");
+tabsEl.addEventListener("click", (e) => {
+  const btn = e.target.closest(".tab");
+  if (!btn) return;
+  curCat = btn.dataset.key;
+  tabsEl.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === btn));
+  if (curCat === "history") showList("history");
+  else if (curCat === "fav") showList("fav");
+  else { showCardMode(); showCategory(); }
+});
+// random：只有这里才抽新文案
+$("randomBtn").addEventListener("click", () => {
+  const it = pick();
+  if (it) lastByCat[curCat] = it.id;
+  render(it);
+});
+// copy
+$("copyBtn").addEventListener("click", () => copyItem(curItem));
+// list buttons (delegated)
+listEl.addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  const item = CORPUS.find(c => c.id === btn.dataset.id);
+  if (btn.classList.contains("hc")) {
+    copyItem(item);
+  } else if (btn.classList.contains("hf")) {
+    favs = favs.filter(f => f !== btn.dataset.id);
+    localStorage.setItem("bwc_favs", JSON.stringify(favs));
+    toast("已取消收藏");
+    showList("fav");
+  }
+});
+// fav
+favBtn.addEventListener("click", () => {
+  if (!curItem) return;
+  if (favs.includes(curItem.id)) {
+    favs = favs.filter(f => f !== curItem.id);
+    toast("已取消收藏");
+  } else {
+    favs.push(curItem.id);
+    toast("❤️ 收藏成功");
+  }
+  localStorage.setItem("bwc_favs", JSON.stringify(favs));
+  favBtn.textContent = favs.includes(curItem.id) ? "❤️" : "🤍";
+  favBtn.classList.toggle("on", favs.includes(curItem.id));
+});
+// init
+showCategory();
+</script>
+</body>
+</html>
