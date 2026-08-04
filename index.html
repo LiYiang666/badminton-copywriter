@@ -1968,6 +1968,12 @@ const tabsEl = $("tabs"), textEl = $("text"), tagsEl = $("tags"), badgeEl = $("b
       favBtn = $("favBtn"), toastEl = $("toast"), cardEl = $("card"),
       listEl = $("list"), footerBar = $("footerBar");
 
+function saveLS(key, val) {
+  try { localStorage.setItem(key, val); } catch (e) {}
+}
+function saveLS(key, val) {
+  try { localStorage.setItem(key, val); } catch (e) {}
+}
 function esc(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
@@ -2000,7 +2006,7 @@ function pick() {
   const item = p.find(c => c.id === id) || null;
   if (item) {
     hist = [item.id, ...hist.filter(h => h !== item.id)].slice(0, 50);
-    localStorage.setItem("bwc_hist", JSON.stringify(hist));
+    saveLS("bwc_hist", JSON.stringify(hist));
     if (bag.length === 0) {
       toast("该分类文案已经全部刷完啦~ 如果想要更多文案请联系昂哥 🏸");
     }
@@ -2118,7 +2124,7 @@ listEl.addEventListener("click", (e) => {
     copyItem(item);
   } else if (btn.classList.contains("hf")) {
     favs = favs.filter(f => f !== btn.dataset.id);
-    localStorage.setItem("bwc_favs", JSON.stringify(favs));
+    saveLS("bwc_favs", JSON.stringify(favs));
     toast("已取消收藏");
     showList("fav");
   }
@@ -2133,7 +2139,7 @@ favBtn.addEventListener("click", () => {
     favs.push(curItem.id);
     toast("❤️ 收藏成功");
   }
-  localStorage.setItem("bwc_favs", JSON.stringify(favs));
+  saveLS("bwc_favs", JSON.stringify(favs));
   favBtn.textContent = favs.includes(curItem.id) ? "❤️" : "🤍";
   favBtn.classList.toggle("on", favs.includes(curItem.id));
 });
