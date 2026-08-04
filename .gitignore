@@ -1,0 +1,4 @@
+tools/node_modules/
+tools/render_out/
+tools/*.png
+data/raw_captions*.json
