@@ -17,15 +17,16 @@
   }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
-  html, body { min-height: 100%; }
+  html { height: 100%; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     background: linear-gradient(165deg, #E6FAF3 0%, #FFF0F4 55%, #FFE9EE 100%);
     color: var(--ink);
     display: flex; flex-direction: column;
     max-width: 480px; margin: 0 auto;
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
   }
   header { padding: 22px 20px 10px; text-align: center; }
   header h1 {
@@ -49,7 +50,7 @@
     color: #fff; border-color: transparent;
     box-shadow: 0 4px 12px rgba(232, 106, 138, 0.3);
   }
-  main { flex: 1; display: flex; flex-direction: column; padding: 8px 20px 12px; }
+  main { flex: 1; display: flex; flex-direction: column; padding: 8px 20px 12px; min-height: 0; overflow-y: auto; }
   .card {
     background: var(--card); border-radius: 24px; padding: 28px 24px 20px;
     box-shadow: 0 10px 30px rgba(26, 127, 100, 0.10), 0 2px 8px rgba(232,106,138,0.08);
@@ -99,7 +100,10 @@
     cursor: pointer; box-shadow: 0 8px 20px rgba(232,106,138,0.35); transition: transform 0.15s;
   }
   .btn-random:active { transform: scale(0.97); }
-  .list { display: flex; flex-direction: column; gap: 10px; padding: 6px 2px; margin: auto 0; width: 100%; }
+  .list { display: flex; flex-direction: column; gap: 10px; padding: 6px 2px 12px; width: 100%; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(232,106,138,0.4) transparent; }
+  .list::-webkit-scrollbar { width: 4px; }
+  .list::-webkit-scrollbar-thumb { background: rgba(232,106,138,0.4); border-radius: 4px; }
+  .list::-webkit-scrollbar-track { background: transparent; }
   .list-item {
     background: #fff; border-radius: 16px; padding: 12px 14px;
     box-shadow: 0 2px 8px rgba(26,127,100,0.08);
