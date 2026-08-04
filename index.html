@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#7ED8C3">
+<title>🏸 羽毛球甜妹文案生成器</title>
+<style>
+  :root {
+    --mint: #58C7AC;
+    --mint-deep: #1A7F64;
+    --pink: #FF8FAB;
+    --pink-deep: #E86A8A;
+    --ink: #3A3A4A;
+    --ink-soft: #8A8A9A;
+    --card: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(165deg, #E6FAF3 0%, #FFF0F4 55%, #FFE9EE 100%);
+    color: var(--ink);
+    display: flex; flex-direction: column;
+    max-width: 480px; margin: 0 auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  header {
+    padding: 22px 20px 10px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--mint-deep), var(--pink-deep));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 0.5px;
+  }
+  header p { font-size: 0.75rem; color: var(--ink-soft); margin-top: 4px; }
+  .tabs {
+    display: flex; gap: 8px;
+    padding: 10px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(88, 199, 172, 0.35);
+    background: rgba(255,255,255,0.75);
+    color: var(--mint-deep);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    backdrop-filter: blur(4px);
+  }
+  .tab.active {
+    background: linear-gradient(90deg, var(--mint), var(--pink));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(232, 106, 138, 0.3);
+  }
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px 20px 12px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 28px 24px 20px;
+    box-shadow: 0 10px 30px rgba(26, 127, 100, 0.10), 0 2px 8px rgba(232,106,138,0.08);
+    position: relative;
+    animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes pop {
+    0% { transform: scale(0.92) translateY(8px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .card .badge {
+    position: absolute; top: -12px; left: 24px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--mint), var(--pink));
+    color: #fff; font-size: 0.72rem; font-weight: 700;
+    box-shadow: 0 3px 8px rgba(232,106,138,0.35);
+  }
+  .card .text {
+    font-size: 1.3rem;
+    line-height: 1.75;
+    font-weight: 700;
+    min-height: 4.5em;
+    display: flex; align-items: center;
+    word-break: break-all;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .tag {
+    font-size: 0.72rem;
+    color: var(--pink-deep);
+    background: #FFF0F4;
+    border: 1px solid rgba(232,106,138,0.25);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .card-actions {
+    display: flex; gap: 10px; margin-top: 18px;
+    border-top: 1px dashed #EEE;
+    padding-top: 14px;
+  }
+  .btn-copy {
+    flex: 1;
+    padding: 12px 0;
+    border: none; border-radius: 14px;
+    background: linear-gradient(90deg, var(--mint), #6FD3BC);
+    color: #fff; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(88,199,172,0.35);
+    transition: transform 0.15s;
+  }
+  .btn-copy:active { transform: scale(0.96); }
+  .btn-fav {
+    width: 52px;
+    border: 1.5px solid rgba(232,106,138,0.35);
+    border-radius: 14px;
+    background: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .btn-fav.on { background: #FFF0F4; border-color: var(--pink); }
+  .btn-fav:active { transform: scale(0.9); }
+  .footer-bar {
+    padding: 6px 20px calc(20px + env(safe-area-inset-bottom));
+    flex-shrink: 0;
+  }
+  .btn-random {
+    width: 100%;
+    padding: 17px 0;
+    border: none; border-radius: 999px;
+    background: linear-gradient(90deg, var(--mint), var(--pink));
+    color: #fff;
+    font-size: 1.1rem; font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(232,106,138,0.35);
+    transition: transform 0.15s;
+  }
+  .btn-random:active { transform: scale(0.97); }
+  .toast {
+    position: fixed; top: 24px; left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: rgba(58,58,74,0.92);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 99;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .empty { text-align: center; color: var(--ink-soft); font-size: 0.9rem; padding: 40px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🏸 羽毛球甜妹文案生成器</h1>
+  <p>一点就有文案 · 发球式灵感</p>
+</header>
+<div class="tabs" id="tabs"></div>
+<main>
+  <div class="card" id="card">
+    <span class="badge" id="badge">甜美撒娇</span>
+    <div class="text" id="text"></div>
+    <div class="tags" id="tags"></div>
+    <div class="card-actions">
+      <button class="btn-copy" id="copyBtn">📋 一键复制</button>
+      <button class="btn-fav" id="favBtn">🤍</button>
+    </div>
+  </div>
+</main>
+<div class="footer-bar">
+  <button class="btn-random" id="randomBtn">🎲 换一条</button>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const CORPUS = [
+ {
+  "id": "001",
+  "text": "让你破费了哥，下次可以再杀重点",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "002",
+  "text": "“我养的鹅，变成了我孩子买不起的羽毛球”",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "003",
+  "text": "羽毛球第一课 就要学会扎高马尾",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#阴天摇",
+   "#普锐森羽毛球"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "004",
+  "text": "穿yonex 的女生多有品味我就不说了",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "005",
+  "text": "羽毛球有手就行大家没有意见吧？",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "006",
+  "text": "带这些可以跟你一起打球吗？",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#变装",
+   "#反差"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "007",
+  "text": "穿十厘米的高跟鞋，也照样能杀球",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "008",
+  "text": "我把高跟鞋都踩上了，这就是你说的带我干最喜欢的事儿？",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "009",
+  "text": "你的队友交给我会处理～",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "010",
+  "text": "羡慕吧，你们都没有这样的搭档",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#欧击小狗陪你挥拍",
+   "#出门打球就背小狗羽毛球包"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "011",
+  "text": "我打扮这么好看，你带我打室外羽毛球？",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "012",
+  "text": "精心打扮约我打球，你是怕运动装你更打不过？",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "013",
+  "text": "这就是你让我精心打扮要带我玩的项目？",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#打羽毛女生",
+   "#内容过于真实"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "014",
+  "text": "跟我们打一场酣畅淋漓的羽毛球吧！",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#转场"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "015",
+  "text": "羽毛球不仅是竞技，也可以是浪漫的",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感"
+  ],
+  "source": "bietouxiaoqiu"
+ },
+ {
+  "id": "016",
+  "text": "“杀我队友干嘛 有种你杀我啊”",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#依赖摇",
+   "#男单障碍赛"
+  ],
+  "source": "moxingdeazhen"
+ },
+ {
+  "id": "017",
+  "text": "要参加我的婚礼的可以准备份子了",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#剧情",
+   "#搞笑转场"
+  ],
+  "source": "moxingdeazhen"
+ },
+ {
+  "id": "018",
+  "text": "有没有新生要加入我们羽毛球社呀？＃羽毛球",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#抽帧舞＃威臣航海王联名",
+   "#威臣航海王联名球拍"
+  ],
+  "source": "moxingdeazhen"
+ },
+ {
+  "id": "019",
+  "text": "你们的恶魔搭子来了 yC",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#小恶魔装＃是天使还是恶魔我自有判断",
+   "#老师"
+  ],
+  "source": "moxingdeazhen"
+ },
+ {
+  "id": "020",
+  "text": "抖音变装还是太权威了",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#柳智敏法庭跳舞",
+   "#whiplash"
+  ],
+  "source": "moxingdeazhen"
+ },
+ {
+  "id": "021",
+  "text": "直接转给你那爱迟到的球友",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#dou来挥拍",
+   "#imsoexcited舞蹈挑战"
+  ],
+  "source": "moxingdeazhen"
+ },
+ {
+  "id": "022",
+  "text": "穿这套去相亲或面试资你打几分！",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#Lelenth变装舞蹈挑战",
+   "#面试穿搭"
+  ],
+  "source": "moxingdeazhen"
+ },
+ {
+  "id": "023",
+  "text": "走帅哥的路，让帅哥无路可走",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽毛球单打",
+   "#198"
+  ],
+  "source": "xiaodian"
+ },
+ {
+  "id": "024",
+  "text": "川渝暴龙也不过如此",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽毛球🏸运动女孩",
+   "#198"
+  ],
+  "source": "xiaodian"
+ },
+ {
+  "id": "025",
+  "text": "就让练体育的我们",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#178",
+   "#体育"
+  ],
+  "source": "xiaodian"
+ },
+ {
+  "id": "026",
+  "text": "你对我的理解 无声的告别",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#175",
+   "#金牛座"
+  ],
+  "source": "xiaodian"
+ },
+ {
+  "id": "027",
+  "text": "羽毛球照亮你眼睛 不需要再多也美丽",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "xiaodian"
+ },
+ {
+  "id": "028",
+  "text": "再也不嘴硬了",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "xiaodian"
+ },
+ {
+  "id": "029",
+  "text": "打球前vs打球后….",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#抽象文学"
+  ],
+  "source": "xiaodian"
+ },
+ {
+  "id": "030",
+  "text": "携手球搭子祝羽球人新年快乐 万事胜意 远离伤病 猛增球技",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#一起打羽毛球",
+   "#喂打球吗"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "031",
+  "text": "谁懂啊 紫色系真的好看啊",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#冰川羽毛球拍",
+   "#马面裙"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "032",
+  "text": "送君茉莉 愿君莫离",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "033",
+  "text": "没错 星际就是适合我们甜妹",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#女大学生"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "034",
+  "text": "球搭子都会玩反差",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#一起打羽毛球"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "035",
+  "text": "我宣布 彩礼加一只冰川",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#冰川羽毛球拍",
+   "#一起打羽毛球"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "036",
+  "text": "凡人百年 爱是秩序外的一瞬间",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#变装"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "037",
+  "text": "如果没有羽毛球 我们甚至不会相识",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#一起打羽毛球"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "038",
+  "text": "德善啊 剧本不都告诉你了吗 选那个光明正大爱你的人",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#冰川羽毛球拍"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "039",
+  "text": "向上的生命力比皮囊更有杀伤力",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#一起打羽毛球"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "040",
+  "text": "我将球拍藏在身后 期待着下次与你赴约",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#高颜值球拍"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "041",
+  "text": "该打球了 大家多吃点球拍哦",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#冰川羽毛球拍",
+   "#jk制服"
+  ],
+  "source": "xiaoai"
+ },
+ {
+  "id": "042",
+  "text": "还不给自己的球搭子安排上？🤩",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#闪跃糯糯胶PRO",
+   "#手胶"
+  ],
+  "source": "yeye"
+ },
+ {
+  "id": "043",
+  "text": "握不住的东西太多太多",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽毛球拍",
+   "#羽毛球装备"
+  ],
+  "source": "yeye"
+ },
+ {
+  "id": "044",
+  "text": "到最后空空的钱包， 岁的膝盖",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#为什么羽毛球越来越贵",
+   "#羽球人"
+  ],
+  "source": "yeye"
+ },
+ {
+  "id": "045",
+  "text": "我真的要笑死了 这个 很抽象",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽毛球🏸",
+   "#羽毛球运动"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "046",
+  "text": "🥺🥺 背负情感伦理道德尊严的一球",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#打羽毛球🏸"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "047",
+  "text": "谁能不爱上一个陪我们打球的老板",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#打羽毛球🏸"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "048",
+  "text": "同龄人结婚生子 我游泳健身羽毛球",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "049",
+  "text": "今晚还打球嘛",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽球人的口粮",
+   "#羽毛球装备"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "050",
+  "text": "情侣打羽毛球混双的好处是… 还没想到",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽毛球混双",
+   "#黄雅琼"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "051",
+  "text": "为什么打羽毛球不瘦",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#杭州羽毛球",
+   "#为什么打羽毛球不减肥"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "052",
+  "text": "这是多少羽球人梦寐以求的场景",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽毛球混合双打",
+   "#杭州羽毛球"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "053",
+  "text": "没错我就是要水一个视频",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽毛球🏸",
+   "#羽毛球girl🏸"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "054",
+  "text": "羽毛球人的 充满了惊喜",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#杭州羽毛球"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "055",
+  "text": "自从你打了羽毛球，林丹都去打高尔夫了",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#杭州羽毛球"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "056",
+  "text": "上班八小时后打球两小时的女人还有什么做不到的",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#杭州羽毛球"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "057",
+  "text": "我爱打羽毛球",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#打羽毛球🏸",
+   "#杭州羽毛球"
+  ],
+  "source": "baqianmeimei"
+ },
+ {
+  "id": "058",
+  "text": "混双 混双 女孩子很重要",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽毛球混双"
+  ],
+  "source": "yuqiuxiaolaodao"
+ },
+ {
+  "id": "059",
+  "text": "羽毛球怎么可能和谁打都一样呢？ 我的正手是禁飞区 难道反手就不是了吗？",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#禁飞区",
+   "#混双"
+  ],
+  "source": "yuqiuxiaolaodao"
+ },
+ {
+  "id": "060",
+  "text": "互换搭档的快乐 原来混双网前这么好玩",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽毛球混双"
+  ],
+  "source": "yuqiuxiaolaodao"
+ },
+ {
+  "id": "061",
+  "text": "混双or女双？ 混双怎么轮转？送你四个字 “各凭本事”😏",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#dou来挥拍",
+   "#羽球人ootd"
+  ],
+  "source": "yuqiuxiaolaodao"
+ },
+ {
+  "id": "062",
+  "text": "手感回归！芜湖！！！",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#羽毛球女生"
+  ],
+  "source": "zhoumei"
+ },
+ {
+  "id": "063",
+  "text": "，羽球人发泄情绪方式，人生太苦了😅",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#泰国美如"
+  ],
+  "source": "taiguomeiru"
+ },
+ {
+  "id": "064",
+  "text": "今天跟年轻人打球🏸～",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#泰国美如"
+  ],
+  "source": "taiguomeiru"
+ },
+ {
+  "id": "065",
+  "text": "今天穿了川崎羽毛球服，非常舒服💖",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "taiguomeiru"
+ },
+ {
+  "id": "066",
+  "text": "一起打球吗💕🏸",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#泰国美如"
+  ],
+  "source": "taiguomeiru"
+ },
+ {
+  "id": "067",
+  "text": "跟肌肉男哥哥暴力打球了，不得不用这首歌因为他杀球太猛了😂",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#泰国美如"
+  ],
+  "source": "taiguomeiru"
+ },
+ {
+  "id": "068",
+  "text": "又来发泄情绪了🥹",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#泰国美如"
+  ],
+  "source": "taiguomeiru"
+ },
+ {
+  "id": "069",
+  "text": "一起打球呀🏸💖",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "taiguomeiru"
+ },
+ {
+  "id": "070",
+  "text": "想念夏天在泳池里打球",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "jinxiaopang"
+ },
+ {
+  "id": "071",
+  "text": "女孩子一定要学会温柔",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "jinxiaopang"
+ },
+ {
+  "id": "072",
+  "text": "她看上了我的球拍怎么办",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#外甥女"
+  ],
+  "source": "jinxiaopang"
+ },
+ {
+  "id": "073",
+  "text": "羽球人到底喜欢打什么球",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "jinxiaopang"
+ },
+ {
+  "id": "074",
+  "text": "好搭档的配合有多重要",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#热血沸腾的羽毛球组合技"
+  ],
+  "source": "jinxiaopang"
+ },
+ {
+  "id": "075",
+  "text": "羽毛球当然要和朋友一起才有乐趣",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "jinxiaopang"
+ },
+ {
+  "id": "076",
+  "text": "有我在别怕！这次你也是两个人！ 小小黄ɞ🏸️",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#是时候展现真正的技术了",
+   "#骚操作秀一波"
+  ],
+  "source": "jinxiaopang"
+ },
+ {
+  "id": "077",
+  "text": "和蓝朋友们的一场俯卧撑之战",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#天津消防",
+   "#挑战王小羽"
+  ],
+  "source": "wangxiaoyu"
+ },
+ {
+  "id": "078",
+  "text": "混双抱大腿，呜呼乐哉！",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "wangxiaoyu"
+ },
+ {
+  "id": "079",
+  "text": "这就是杀敌八百自损一千的“章鱼吊”",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生"
+  ],
+  "source": "wangxiaoyu"
+ },
+ {
+  "id": "080",
+  "text": "奔赴 km的羽毛球之约",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#奥迪Q6letron",
+   "#豪华智电驾享SUV新选择"
+  ],
+  "source": "wangxiaoyu"
+ },
+ {
+  "id": "081",
+  "text": "我不是在任性，我只是想让你陪我打球",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "082",
+  "text": "今天的甜度，是羽毛球服提供的",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "083",
+  "text": "别只看我，也看看球呀",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "084",
+  "text": "后场交给你，可爱交给我",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "085",
+  "text": "一拍把球打进你心里",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "086",
+  "text": "撒娇我不太会，打球我是认真的",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "087",
+  "text": "风吹起了裙摆，也吹乱了心跳",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "088",
+  "text": "打完球给我买冰棍好不好",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "089",
+  "text": "我的高马尾比杀球还可爱",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "090",
+  "text": "别夸我，我会骄傲，骄傲就会接不到球",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "091",
+  "text": "这球不是打出去的，是抛给你的",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "092",
+  "text": "今天穿了最喜欢的球服，不许让我接不到",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "093",
+  "text": "舞蹈学得慢，可爱学得快",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "094",
+  "text": "羽毛球知道的，我今天是来见你的",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "095",
+  "text": "输给我的话，要请我喝奶茶哦",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "096",
+  "text": "不许凶我，凶我就让你赢一局",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "097",
+  "text": "我笑起来比杀球更治愈",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "098",
+  "text": "今天也是扎着高马尾的甜妹",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "099",
+  "text": "凶是给球场的，软是给你的",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "100",
+  "text": "把羽毛球装进你的口袋哦",
+  "category": "sweet",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#甜妹",
+   "#手势舞"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "101",
+  "text": "我甜是我甜，杀球可不甜",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "102",
+  "text": "别被球服骗了，场上我是老板",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "103",
+  "text": "能跳最软的舞，也能杀最狠的球",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "104",
+  "text": "你说我爱显摆，我说你是羡妒",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "105",
+  "text": "漂亮我负责，赢球我也负责",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "106",
+  "text": "别叫我小甜心，场上请叫我王教练",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "107",
+  "text": "我的反差不是演的，是日常",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "108",
+  "text": "手势舞我不会输，比赛我也不会",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "109",
+  "text": "颜值是入场券，球技是王牌",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "110",
+  "text": "头发一扎，气场全开",
+  "category": "confident",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#反差",
+   "#变装"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "111",
+  "text": "球瘾又犯了，有人去球馆吗",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球瘾犯了",
+   "#羽毛球日常"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "112",
+  "text": "球服一换，心情都变晴了",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球瘾犯了",
+   "#羽毛球日常"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "113",
+  "text": "球馆的空调很冷，我的心很热",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球瘾犯了",
+   "#羽毛球日常"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "114",
+  "text": "羽毛球的声音，是最好的白噪音",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球瘾犯了",
+   "#羽毛球日常"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "115",
+  "text": "下班直冲球馆，是我的打卡方式",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球瘾犯了",
+   "#羽毛球日常"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "116",
+  "text": "一个人的羽毛球是练习，两个人的是约会",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球瘾犯了",
+   "#羽毛球日常"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "117",
+  "text": "我的球包比化妆包还满",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球瘾犯了",
+   "#羽毛球日常"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "118",
+  "text": "本月最开心的事：新手胶到了",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球瘾犯了",
+   "#羽毛球日常"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "119",
+  "text": "今天跑了三公里，只为抢个场地",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球瘾犯了",
+   "#羽毛球日常"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "120",
+  "text": "周末只有两种状态：打球和去打球",
+  "category": "badminton",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球瘾犯了",
+   "#羽毛球日常"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "121",
+  "text": "风起了，我的心也跟着见你起风",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "122",
+  "text": "夏天的风，把羽毛球吹到了你那边",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "123",
+  "text": "青春是身上的球服，和远处的你",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "124",
+  "text": "羽毛球划出的弧线，是心跳的形状",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "125",
+  "text": "灯光很柔，你也是",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "126",
+  "text": "汗水在发光，那是我的星光",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "127",
+  "text": "想和你打球打到灯火熄灭",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "128",
+  "text": "风知道，云知道，你也要知道",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "129",
+  "text": "BGM很甜，但不如和你打球甜",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "130",
+  "text": "那天的夕阳，正好落在你肩上",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "131",
+  "text": "舞蹈练了一百遍，只为你一眼",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "132",
+  "text": "夏天的故事，都在这一局里",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "133",
+  "text": "你是我打完球之后的额外快乐",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "134",
+  "text": "音乐响起的那一刻，世界都是我的舞台",
+  "category": "lyric",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#氛围感",
+   "#治愈"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "135",
+  "text": "艾特你的球搭子，被艾特的请客打球",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "136",
+  "text": "有人一起打球吗，我带球你带心",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "137",
+  "text": "快艾特你那个总迟到的朋友",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "138",
+  "text": "这个手势舞，要和球搭子一起学",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "139",
+  "text": "说，有多少人是被球服骗来打羽毛球的？",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "140",
+  "text": "左边还是右边？帮我选",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "141",
+  "text": "看完还不会约女孩打球的举手",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "142",
+  "text": "艾特你的闺蜜来学这个舞蹈",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "143",
+  "text": "打完球第一件事干什么？评论告诉我",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "144",
+  "text": "招球搭子，待遇从优",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "145",
+  "text": "转发给你的球搭子，懂的都懂",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "146",
+  "text": "混双女孩的甜度有多高？",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "147",
+  "text": "学会了吗？没学会收藏慢慢学",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "148",
+  "text": "来一局，输的买水",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "149",
+  "text": "谁教你这么打球的？艾特他来负责",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "150",
+  "text": "今晚球馆，谁跟我一起？",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "151",
+  "text": "艾特你的混双搭档来学",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "152",
+  "text": "你有什么想对球搭子说的？我帮你转达",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "153",
+  "text": "收我当球搭子吗？",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ },
+ {
+  "id": "154",
+  "text": "姐妹们，下次跳什么歌？",
+  "category": "interact",
+  "tags": [
+   "#羽毛球",
+   "#打羽毛球女生",
+   "#球搭子",
+   "#艾特你的球搭子"
+  ],
+  "source": "ai"
+ }
+];
+const CATS = [
+  { key: "all", label: "✨ 全部" },
+  { key: "sweet", label: "🍬 甜美撒娇" },
+  { key: "confident", label: "😎 自信反差" },
+  { key: "badminton", label: "🏸 羽毛球梗" },
+  { key: "lyric", label: "🎵 歌词向" },
+  { key: "interact", label: "👯 互动召唤" },
+  { key: "fav", label: "❤️ 收藏" }
+];
+const CAT_LABEL = { sweet: "🍬 甜美撒娇", confident: "😎 自信反差", badminton: "🏸 羽毛球梗", lyric: "🎵 歌词向", interact: "👯 互动召唤" };
+let curCat = "all";
+let curItem = null;
+let favs = [];
+try { favs = JSON.parse(localStorage.getItem("bwc_favs") || "[]"); } catch (e) { favs = []; }
+
+const $ = (id) => document.getElementById(id);
+const tabsEl = $("tabs"), textEl = $("text"), tagsEl = $("tags"), badgeEl = $("badge"),
+      favBtn = $("favBtn"), toastEl = $("toast"), cardEl = $("card");
+
+function pool() {
+  if (curCat === "all") return CORPUS;
+  if (curCat === "fav") return CORPUS.filter(c => favs.includes(c.id));
+  return CORPUS.filter(c => c.category === curCat);
+}
+function pick() {
+  const p = pool();
+  if (!p.length) return null;
+  let item = p[Math.floor(Math.random() * p.length)];
+  if (p.length > 1) {
+    let guard = 0;
+    while (curItem && item.id === curItem.id && guard++ < 10) {
+      item = p[Math.floor(Math.random() * p.length)];
+    }
+  }
+  return item;
+}
+function render(item) {
+  curItem = item;
+  if (!item) {
+    badgeEl.textContent = "❤️ 收藏";
+    textEl.innerHTML = '<div class="empty" style="width:100%">还没有收藏哦<br>看到喜欢的点 🤍 收起来吧</div>';
+    tagsEl.innerHTML = "";
+    favBtn.textContent = "🤍";
+    return;
+  }
+  badgeEl.textContent = CAT_LABEL[item.category] || "";
+  textEl.textContent = item.text;
+  tagsEl.innerHTML = item.tags.map(t => '<span class="tag">' + t + "</span>").join("");
+  favBtn.textContent = favs.includes(item.id) ? "❤️" : "🤍";
+  favBtn.classList.toggle("on", favs.includes(item.id));
+  // restart pop animation
+  cardEl.style.animation = "none";
+  void cardEl.offsetWidth;
+  cardEl.style.animation = "";
+}
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  setTimeout(() => toastEl.classList.remove("show"), 1600);
+}
+// tabs
+tabsEl.innerHTML = CATS.map(c =>
+  '<button class="tab' + (c.key === curCat ? " active" : "") + '" data-key="' + c.key + '">' + c.label + "</button>"
+).join("");
+tabsEl.addEventListener("click", (e) => {
+  const btn = e.target.closest(".tab");
+  if (!btn) return;
+  curCat = btn.dataset.key;
+  tabsEl.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === btn));
+  render(pick());
+});
+// random
+$("randomBtn").addEventListener("click", () => render(pick()));
+// copy
+$("copyBtn").addEventListener("click", async () => {
+  if (!curItem) { toast("先抽一条文案吧～"); return; }
+  const full = curItem.text + "\n" + curItem.tags.join(" ");
+  try {
+    await navigator.clipboard.writeText(full);
+    toast("✅ 已复制，去粘贴吧！");
+  } catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = full;
+    ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    toast("✅ 已复制，去粘贴吧！");
+  }
+});
+// fav
+favBtn.addEventListener("click", () => {
+  if (!curItem) return;
+  if (favs.includes(curItem.id)) {
+    favs = favs.filter(f => f !== curItem.id);
+    toast("已取消收藏");
+  } else {
+    favs.push(curItem.id);
+    toast("❤️ 收藏成功");
+  }
+  localStorage.setItem("bwc_favs", JSON.stringify(favs));
+  favBtn.textContent = favs.includes(curItem.id) ? "❤️" : "🤍";
+  favBtn.classList.toggle("on", favs.includes(curItem.id));
+  if (curCat === "fav") render(pick());
+});
+// init
+render(pick());
+</script>
+</body>
+</html>
