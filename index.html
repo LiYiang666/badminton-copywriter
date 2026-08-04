@@ -16,7 +16,8 @@
     --card: #FFFFFF;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; }
+  [hidden] { display: none !important; }
+  html, body { min-height: 100%; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     background: linear-gradient(165deg, #E6FAF3 0%, #FFF0F4 55%, #FFE9EE 100%);
@@ -48,11 +49,12 @@
     color: #fff; border-color: transparent;
     box-shadow: 0 4px 12px rgba(232, 106, 138, 0.3);
   }
-  main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 8px 20px 12px; min-height: 0; }
+  main { flex: 1; display: flex; flex-direction: column; padding: 8px 20px 12px; }
   .card {
     background: var(--card); border-radius: 24px; padding: 28px 24px 20px;
     box-shadow: 0 10px 30px rgba(26, 127, 100, 0.10), 0 2px 8px rgba(232,106,138,0.08);
     position: relative;
+    margin: auto 0;
     animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   @keyframes pop {
@@ -97,20 +99,21 @@
     cursor: pointer; box-shadow: 0 8px 20px rgba(232,106,138,0.35); transition: transform 0.15s;
   }
   .btn-random:active { transform: scale(0.97); }
-  .hist-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding: 6px 2px; }
-  .hist-item {
+  .list { display: flex; flex-direction: column; gap: 10px; padding: 6px 2px; margin: auto 0; width: 100%; }
+  .list-item {
     background: #fff; border-radius: 16px; padding: 12px 14px;
     box-shadow: 0 2px 8px rgba(26,127,100,0.08);
-    display: flex; gap: 10px; align-items: center;
+    display: flex; gap: 8px; align-items: center;
     animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .hist-item .ht { flex: 1; font-size: 0.9rem; font-weight: 600; line-height: 1.55; word-break: break-all; }
-  .hist-item .hc {
-    border: none; background: #FFF0F4; color: var(--pink-deep);
-    border-radius: 10px; padding: 8px 12px; font-size: 0.8rem; font-weight: 700;
-    cursor: pointer; flex-shrink: 0;
+  .list-item .ht { flex: 1; font-size: 0.9rem; font-weight: 600; line-height: 1.55; word-break: break-all; }
+  .list-item button {
+    border: none; border-radius: 10px; padding: 8px 12px;
+    font-size: 0.8rem; font-weight: 700; cursor: pointer; flex-shrink: 0;
   }
-  .hist-item .hc:active { transform: scale(0.92); }
+  .list-item .hc { background: #FFF0F4; color: var(--pink-deep); }
+  .list-item .hf { background: #E6FAF3; color: var(--mint-deep); }
+  .list-item button:active { transform: scale(0.92); }
   .toast {
     position: fixed; top: 24px; left: 50%;
     transform: translateX(-50%) translateY(-80px);
@@ -126,7 +129,7 @@
     body { max-width: 680px; }
     .tabs { flex-wrap: wrap; justify-content: center; overflow: visible; }
     .card .text { font-size: 1.5rem; }
-    .hist-item .ht { font-size: 1rem; }
+    .list-item .ht { font-size: 1rem; }
   }
 </style>
 </head>
@@ -146,7 +149,7 @@
       <button class="btn-fav" id="favBtn">🤍</button>
     </div>
   </div>
-  <div class="hist-list" id="histList" hidden></div>
+  <div class="list" id="list" hidden></div>
 </main>
 <div class="footer-bar" id="footerBar">
   <button class="btn-random" id="randomBtn">🎲 换一条</button>
@@ -1953,20 +1956,20 @@ let curCat = "all";
 let curItem = null;
 let favs = [];
 let hist = [];
+let lastByCat = {};
 try { favs = JSON.parse(localStorage.getItem("bwc_favs") || "[]"); } catch (e) { favs = []; }
 try { hist = JSON.parse(localStorage.getItem("bwc_hist") || "[]"); } catch (e) { hist = []; }
 
 const $ = (id) => document.getElementById(id);
 const tabsEl = $("tabs"), textEl = $("text"), tagsEl = $("tags"), badgeEl = $("badge"),
       favBtn = $("favBtn"), toastEl = $("toast"), cardEl = $("card"),
-      histList = $("histList"), footerBar = $("footerBar");
+      listEl = $("list"), footerBar = $("footerBar");
 
 function esc(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 function pool() {
   if (curCat === "all") return CORPUS;
-  if (curCat === "fav") return CORPUS.filter(c => favs.includes(c.id));
   return CORPUS.filter(c => c.category === curCat);
 }
 // 不重复抽取：每个分类一个洗牌袋，抽完一轮再重新洗牌
@@ -1996,7 +1999,7 @@ function pick() {
     hist = [item.id, ...hist.filter(h => h !== item.id)].slice(0, 50);
     localStorage.setItem("bwc_hist", JSON.stringify(hist));
     if (bag.length === 0) {
-      toast(curCat === "fav" ? "收藏已经全部刷完一轮啦~" : "该分类文案已经全部刷完啦~ 如果想要更多文案请联系昂哥 🏸");
+      toast("该分类文案已经全部刷完啦~ 如果想要更多文案请联系昂哥 🏸");
     }
   }
   return item;
@@ -2004,8 +2007,8 @@ function pick() {
 function render(item) {
   curItem = item;
   if (!item) {
-    badgeEl.textContent = "❤️ 收藏";
-    textEl.innerHTML = '<div class="empty" style="width:100%">还没有收藏哦<br>看到喜欢的点 🤍 收起来吧</div>';
+    badgeEl.textContent = "✨ 全部";
+    textEl.innerHTML = '<div class="empty" style="width:100%">这里还没有文案哦</div>';
     tagsEl.innerHTML = "";
     favBtn.textContent = "🤍";
     return;
@@ -2019,23 +2022,46 @@ function render(item) {
   void cardEl.offsetWidth;
   cardEl.style.animation = "";
 }
-function showHistory() {
-  cardEl.hidden = true;
-  footerBar.style.display = "none";
-  histList.hidden = false;
-  const items = hist.map(id => CORPUS.find(c => c.id === id)).filter(Boolean);
-  if (!items.length) {
-    histList.innerHTML = '<div class="empty">还没有历史记录<br>去抽几条文案吧~</div>';
-    return;
+// 卡片分类：切回时显示上次的文案，只有"换一条"才抽新
+function showCategory() {
+  const remembered = lastByCat[curCat];
+  const item = remembered ? CORPUS.find(c => c.id === remembered) : null;
+  if (item) { render(item); }
+  else {
+    const it = pick();
+    if (it) lastByCat[curCat] = it.id;
+    render(it);
   }
-  histList.innerHTML = items.map(it =>
-    '<div class="hist-item"><div class="ht">' + esc(it.text) + '</div><button class="hc" data-id="' + it.id + '">复制</button></div>'
-  ).join("");
+}
+function showList(mode) {
+  cardEl.hidden = true;
+  footerBar.hidden = true;
+  listEl.hidden = false;
+  let items = [];
+  if (mode === "history") {
+    items = hist.map(id => CORPUS.find(c => c.id === id)).filter(Boolean);
+    if (!items.length) {
+      listEl.innerHTML = '<div class="empty">还没有历史记录<br>去抽几条文案吧~</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(it =>
+      '<div class="list-item"><div class="ht">' + esc(it.text) + '</div><button class="hc" data-id="' + it.id + '">复制</button></div>'
+    ).join("");
+  } else {
+    items = favs.map(id => CORPUS.find(c => c.id === id)).filter(Boolean);
+    if (!items.length) {
+      listEl.innerHTML = '<div class="empty">还没有收藏哦<br>看到喜欢的点 🤍 收起来吧</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(it =>
+      '<div class="list-item"><div class="ht">' + esc(it.text) + '</div><button class="hc" data-id="' + it.id + '">复制</button><button class="hf" data-id="' + it.id + '">取消</button></div>'
+    ).join("");
+  }
 }
 function showCardMode() {
-  histList.hidden = true;
+  listEl.hidden = true;
   cardEl.hidden = false;
-  footerBar.style.display = "";
+  footerBar.hidden = false;
 }
 function toast(msg) {
   toastEl.textContent = msg;
@@ -2059,6 +2085,7 @@ async function copyItem(item) {
     toast("✅ 已复制，去粘贴吧！");
   }
 }
+// tabs
 tabsEl.innerHTML = CATS.map(c =>
   '<button class="tab' + (c.key === curCat ? " active" : "") + '" data-key="' + c.key + '">' + c.label + "</button>"
 ).join("");
@@ -2067,16 +2094,33 @@ tabsEl.addEventListener("click", (e) => {
   if (!btn) return;
   curCat = btn.dataset.key;
   tabsEl.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === btn));
-  if (curCat === "history") showHistory();
-  else { showCardMode(); render(pick()); }
+  if (curCat === "history") showList("history");
+  else if (curCat === "fav") showList("fav");
+  else { showCardMode(); showCategory(); }
 });
-$("randomBtn").addEventListener("click", () => render(pick()));
+// random：只有这里才抽新文案
+$("randomBtn").addEventListener("click", () => {
+  const it = pick();
+  if (it) lastByCat[curCat] = it.id;
+  render(it);
+});
+// copy
 $("copyBtn").addEventListener("click", () => copyItem(curItem));
-histList.addEventListener("click", (e) => {
-  const btn = e.target.closest(".hc");
+// list buttons (delegated)
+listEl.addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
   if (!btn) return;
-  copyItem(CORPUS.find(c => c.id === btn.dataset.id));
+  const item = CORPUS.find(c => c.id === btn.dataset.id);
+  if (btn.classList.contains("hc")) {
+    copyItem(item);
+  } else if (btn.classList.contains("hf")) {
+    favs = favs.filter(f => f !== btn.dataset.id);
+    localStorage.setItem("bwc_favs", JSON.stringify(favs));
+    toast("已取消收藏");
+    showList("fav");
+  }
 });
+// fav
 favBtn.addEventListener("click", () => {
   if (!curItem) return;
   if (favs.includes(curItem.id)) {
@@ -2089,9 +2133,9 @@ favBtn.addEventListener("click", () => {
   localStorage.setItem("bwc_favs", JSON.stringify(favs));
   favBtn.textContent = favs.includes(curItem.id) ? "❤️" : "🤍";
   favBtn.classList.toggle("on", favs.includes(curItem.id));
-  if (curCat === "fav") render(pick());
 });
-render(pick());
+// init
+showCategory();
 </script>
 </body>
 </html>
