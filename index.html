@@ -48,7 +48,7 @@
     color: #fff; border-color: transparent;
     box-shadow: 0 4px 12px rgba(232, 106, 138, 0.3);
   }
-  main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 8px 20px 12px; }
+  main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 8px 20px 12px; min-height: 0; }
   .card {
     background: var(--card); border-radius: 24px; padding: 28px 24px 20px;
     box-shadow: 0 10px 30px rgba(26, 127, 100, 0.10), 0 2px 8px rgba(232,106,138,0.08);
@@ -97,6 +97,20 @@
     cursor: pointer; box-shadow: 0 8px 20px rgba(232,106,138,0.35); transition: transform 0.15s;
   }
   .btn-random:active { transform: scale(0.97); }
+  .hist-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding: 6px 2px; }
+  .hist-item {
+    background: #fff; border-radius: 16px; padding: 12px 14px;
+    box-shadow: 0 2px 8px rgba(26,127,100,0.08);
+    display: flex; gap: 10px; align-items: center;
+    animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .hist-item .ht { flex: 1; font-size: 0.9rem; font-weight: 600; line-height: 1.55; word-break: break-all; }
+  .hist-item .hc {
+    border: none; background: #FFF0F4; color: var(--pink-deep);
+    border-radius: 10px; padding: 8px 12px; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .hist-item .hc:active { transform: scale(0.92); }
   .toast {
     position: fixed; top: 24px; left: 50%;
     transform: translateX(-50%) translateY(-80px);
@@ -104,9 +118,16 @@
     padding: 10px 22px; border-radius: 999px; font-size: 0.85rem;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     z-index: 99; pointer-events: none;
+    max-width: 86%; text-align: center;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
   .empty { text-align: center; color: var(--ink-soft); font-size: 0.9rem; padding: 40px 0; line-height: 2; }
+  @media (min-width: 768px) {
+    body { max-width: 680px; }
+    .tabs { flex-wrap: wrap; justify-content: center; overflow: visible; }
+    .card .text { font-size: 1.5rem; }
+    .hist-item .ht { font-size: 1rem; }
+  }
 </style>
 </head>
 <body>
@@ -125,8 +146,9 @@
       <button class="btn-fav" id="favBtn">🤍</button>
     </div>
   </div>
+  <div class="hist-list" id="histList" hidden></div>
 </main>
-<div class="footer-bar">
+<div class="footer-bar" id="footerBar">
   <button class="btn-random" id="randomBtn">🎲 换一条</button>
 </div>
 <div class="toast" id="toast"></div>
@@ -1923,31 +1945,58 @@ const CATS = [
   { key: "badminton", label: "🏸 羽毛球梗" },
   { key: "lyric", label: "🎵 歌词向" },
   { key: "interact", label: "👯 互动召唤" },
+  { key: "history", label: "🕘 历史" },
   { key: "fav", label: "❤️ 收藏" }
 ];
 const CAT_LABEL = { sweet: "🍬 甜美撒娇", confident: "😎 自信反差", badminton: "🏸 羽毛球梗", lyric: "🎵 歌词向", interact: "👯 互动召唤" };
 let curCat = "all";
 let curItem = null;
 let favs = [];
+let hist = [];
 try { favs = JSON.parse(localStorage.getItem("bwc_favs") || "[]"); } catch (e) { favs = []; }
+try { hist = JSON.parse(localStorage.getItem("bwc_hist") || "[]"); } catch (e) { hist = []; }
 
 const $ = (id) => document.getElementById(id);
 const tabsEl = $("tabs"), textEl = $("text"), tagsEl = $("tags"), badgeEl = $("badge"),
-      favBtn = $("favBtn"), toastEl = $("toast"), cardEl = $("card");
+      favBtn = $("favBtn"), toastEl = $("toast"), cardEl = $("card"),
+      histList = $("histList"), footerBar = $("footerBar");
 
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
 function pool() {
   if (curCat === "all") return CORPUS;
   if (curCat === "fav") return CORPUS.filter(c => favs.includes(c.id));
   return CORPUS.filter(c => c.category === curCat);
 }
+// 不重复抽取：每个分类一个洗牌袋，抽完一轮再重新洗牌
+const bags = {};
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 function pick() {
   const p = pool();
   if (!p.length) return null;
-  let item = p[Math.floor(Math.random() * p.length)];
-  if (p.length > 1) {
-    let guard = 0;
-    while (curItem && item.id === curItem.id && guard++ < 10) {
-      item = p[Math.floor(Math.random() * p.length)];
+  const ids = new Set(p.map(c => c.id));
+  let bag = (bags[curCat] || []).filter(id => ids.has(id));
+  if (!bag.length) bag = shuffle(p.map(c => c.id));
+  let id = bag.pop();
+  if (curItem && id === curItem.id && bag.length) {
+    const swap = bag.pop();
+    bag.push(id);
+    id = swap;
+  }
+  bags[curCat] = bag;
+  const item = p.find(c => c.id === id) || null;
+  if (item) {
+    hist = [item.id, ...hist.filter(h => h !== item.id)].slice(0, 50);
+    localStorage.setItem("bwc_hist", JSON.stringify(hist));
+    if (bag.length === 0) {
+      toast(curCat === "fav" ? "收藏已经全部刷完一轮啦~" : "该分类文案已经全部刷完啦~ 如果想要更多文案请联系昂哥 🏸");
     }
   }
   return item;
@@ -1963,32 +2012,39 @@ function render(item) {
   }
   badgeEl.textContent = CAT_LABEL[item.category] || "";
   textEl.textContent = item.text;
-  tagsEl.innerHTML = item.tags.map(t => '<span class="tag">' + t + "</span>").join("");
+  tagsEl.innerHTML = item.tags.map(t => '<span class="tag">' + esc(t) + "</span>").join("");
   favBtn.textContent = favs.includes(item.id) ? "❤️" : "🤍";
   favBtn.classList.toggle("on", favs.includes(item.id));
   cardEl.style.animation = "none";
   void cardEl.offsetWidth;
   cardEl.style.animation = "";
 }
+function showHistory() {
+  cardEl.hidden = true;
+  footerBar.style.display = "none";
+  histList.hidden = false;
+  const items = hist.map(id => CORPUS.find(c => c.id === id)).filter(Boolean);
+  if (!items.length) {
+    histList.innerHTML = '<div class="empty">还没有历史记录<br>去抽几条文案吧~</div>';
+    return;
+  }
+  histList.innerHTML = items.map(it =>
+    '<div class="hist-item"><div class="ht">' + esc(it.text) + '</div><button class="hc" data-id="' + it.id + '">复制</button></div>'
+  ).join("");
+}
+function showCardMode() {
+  histList.hidden = true;
+  cardEl.hidden = false;
+  footerBar.style.display = "";
+}
 function toast(msg) {
   toastEl.textContent = msg;
   toastEl.classList.add("show");
-  setTimeout(() => toastEl.classList.remove("show"), 1600);
+  setTimeout(() => toastEl.classList.remove("show"), 2200);
 }
-tabsEl.innerHTML = CATS.map(c =>
-  '<button class="tab' + (c.key === curCat ? " active" : "") + '" data-key="' + c.key + '">' + c.label + "</button>"
-).join("");
-tabsEl.addEventListener("click", (e) => {
-  const btn = e.target.closest(".tab");
-  if (!btn) return;
-  curCat = btn.dataset.key;
-  tabsEl.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === btn));
-  render(pick());
-});
-$("randomBtn").addEventListener("click", () => render(pick()));
-$("copyBtn").addEventListener("click", async () => {
-  if (!curItem) { toast("先抽一条文案吧～"); return; }
-  const full = curItem.text + "\n" + curItem.tags.join(" ");
+async function copyItem(item) {
+  if (!item) { toast("先抽一条文案吧～"); return; }
+  const full = item.text + "\n" + item.tags.join(" ");
   try {
     await navigator.clipboard.writeText(full);
     toast("✅ 已复制，去粘贴吧！");
@@ -2002,6 +2058,24 @@ $("copyBtn").addEventListener("click", async () => {
     document.body.removeChild(ta);
     toast("✅ 已复制，去粘贴吧！");
   }
+}
+tabsEl.innerHTML = CATS.map(c =>
+  '<button class="tab' + (c.key === curCat ? " active" : "") + '" data-key="' + c.key + '">' + c.label + "</button>"
+).join("");
+tabsEl.addEventListener("click", (e) => {
+  const btn = e.target.closest(".tab");
+  if (!btn) return;
+  curCat = btn.dataset.key;
+  tabsEl.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === btn));
+  if (curCat === "history") showHistory();
+  else { showCardMode(); render(pick()); }
+});
+$("randomBtn").addEventListener("click", () => render(pick()));
+$("copyBtn").addEventListener("click", () => copyItem(curItem));
+histList.addEventListener("click", (e) => {
+  const btn = e.target.closest(".hc");
+  if (!btn) return;
+  copyItem(CORPUS.find(c => c.id === btn.dataset.id));
 });
 favBtn.addEventListener("click", () => {
   if (!curItem) return;
